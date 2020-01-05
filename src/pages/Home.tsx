@@ -10,20 +10,41 @@ import {
   IonLabel, 
   IonItemSliding, 
   IonItemOption, 
-  IonItemOptions 
+  IonItemOptions ,
+  IonFab,
+  IonFabButton,
+  IonIcon,
+  IonButton,
+  IonModal
 } from '@ionic/react';
+import { add } from 'ionicons/icons';
 import React, { useState, useEffect } from 'react';
 
 import MyHeader from '../components/Header';
 import MyFooter from '../components/Footer';
 import { DummyData } from '../data/dummy-data';
+import uuidv4 from 'uuid/v4';
 
 const Home: React.FC = () => {
   const [itemsArray, setItemsArray] : any = useState([]);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     setItemsArray(DummyData);
   }, []);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const addToList = (item: any) => {
+
+    const tmpList = [...itemsArray];
+
+    const newIndex = uuidv4();
+    item.id = newIndex;
+
+    tmpList.push(item);
+
+    setItemsArray(tmpList);
+  };
 
   const removeFromList = (key: number) => {
  
@@ -60,6 +81,15 @@ const Home: React.FC = () => {
         })}
         </IonList>
       </IonContent>
+      <IonModal isOpen={showModal}>
+        <p>This is modal content</p>
+        <IonButton onClick={() => setShowModal(false)}>Close Modal</IonButton>
+      </IonModal>
+      <IonFab onClick={() => setShowModal(true)} vertical="bottom" horizontal="end" slot="fixed">
+        <IonFabButton>
+          <IonIcon icon={add}/>
+        </IonFabButton>
+      </IonFab>
       <MyFooter/>
     </IonPage>
   );
