@@ -21,7 +21,7 @@ import React, { useState, useEffect } from 'react';
 import MyHeader from '../components/Header';
 import MyFooter from '../components/Footer';
 import SimpleModal from '../components/SimpleModal';
-import { DummyData } from '../data/dummy-data';
+import { notesDataApi } from '../data/notes-data-api';
 import uuidv4 from 'uuid/v4';
 
 const Home: React.FC = () => {
@@ -30,7 +30,12 @@ const Home: React.FC = () => {
   const [itemToEdit, setItemToEdit] = useState({});
 
   useEffect(() => {
-    setItemsArray(DummyData);
+    notesDataApi.getTasks()
+    .then((res) => res.json())
+    .then((items) => {
+      const allItems = items.map((item: any) => ({id: item.id, name: item.title, description: item.body}));
+      setItemsArray(allItems);
+      });
   }, []);
 
   const addToList = (item: any) => {
@@ -40,9 +45,15 @@ const Home: React.FC = () => {
     const newIndex = uuidv4();
     item.id = newIndex;
 
-    tmpList.push(item);
+    notesDataApi.createTask(item)
+        .then(res => res.json())
+        .then(
+          () => {
+            tmpList.push(item);
 
-    setItemsArray(tmpList);
+            setItemsArray(tmpList);
+          }
+        );
   };
 
   const editFromList = (item: any) => {
@@ -51,13 +62,19 @@ const Home: React.FC = () => {
 
     const itemIndex = itemsArray.findIndex((elem: any) => (elem.id === item.id));
 
-    tmpList[itemIndex] = {...item};
+    notesDataApi.putTask(item)
+          .then(res => res.json())
+          .then(
+            () => {
+              tmpList[itemIndex] = {...item};
 
-    setItemsArray(tmpList);
-    setItemToEdit({});
-    setIsEditing(false);
+              setItemsArray(tmpList);
+              setItemToEdit({});
+              setIsEditing(false);
 
-    handleClose(); 
+              handleClose();
+            }
+          );
   };
 
   const getItemToEdit = (id: any) => {
@@ -76,9 +93,16 @@ const Home: React.FC = () => {
     const tmpList = [...itemsArray];
 
     const itemIndex = itemsArray.findIndex((item: any) => (item.id === key));
-    tmpList.splice(itemIndex,1);
 
-    setItemsArray(tmpList);
+    notesDataApi.deleteTask(key)
+        .then(res => res.json())
+        .then(
+          () => {
+            tmpList.splice(itemIndex,1);
+
+            setItemsArray(tmpList);
+          }
+        );
   };
 
   const [openModal, setOpenModal] = useState(false);
