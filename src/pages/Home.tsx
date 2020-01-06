@@ -14,26 +14,23 @@ import {
   IonFab,
   IonFabButton,
   IonIcon,
-  IonButton,
-  IonModal
 } from '@ionic/react';
 import { add } from 'ionicons/icons';
 import React, { useState, useEffect } from 'react';
 
 import MyHeader from '../components/Header';
 import MyFooter from '../components/Footer';
+import SimpleModal from '../components/SimpleModal';
 import { DummyData } from '../data/dummy-data';
 import uuidv4 from 'uuid/v4';
 
 const Home: React.FC = () => {
   const [itemsArray, setItemsArray] : any = useState([]);
-  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     setItemsArray(DummyData);
   }, []);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const addToList = (item: any) => {
 
     const tmpList = [...itemsArray];
@@ -54,6 +51,16 @@ const Home: React.FC = () => {
     tmpList.splice(itemIndex,1);
 
     setItemsArray(tmpList);
+  };
+
+  const [openModal, setOpenModal] = useState(false);
+
+  const handleOpen = () => {
+    setOpenModal(true);
+  };
+
+  const handleClose = () => {
+    setOpenModal(false);
   };
 
   return (
@@ -81,11 +88,13 @@ const Home: React.FC = () => {
         })}
         </IonList>
       </IonContent>
-      <IonModal isOpen={showModal}>
-        <p>This is modal content</p>
-        <IonButton onClick={() => setShowModal(false)}>Close Modal</IonButton>
-      </IonModal>
-      <IonFab onClick={() => setShowModal(true)} vertical="bottom" horizontal="end" slot="fixed">
+      <SimpleModal 
+        addToList={addToList}
+        toggleModal={setOpenModal}
+        isOpen={openModal}
+        handleClose={handleClose}
+      />
+      <IonFab onClick={() => handleOpen()} vertical="bottom" horizontal="end" slot="fixed">
         <IonFabButton>
           <IonIcon icon={add}/>
         </IonFabButton>
