@@ -7,7 +7,7 @@ IonItem,
 IonInput,
 IonTextarea
 } from '@ionic/react';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './SimpleModal.css';
 
 interface SimpleModalProps {
@@ -15,12 +15,25 @@ interface SimpleModalProps {
     isOpen: boolean;
     addToList: any;
     handleClose: any;
+    editFromList: any;
+    isEditing: any;
+    itemToEdit: any;
 }
 
 const SimpleModal: React.FC<SimpleModalProps> = (props: any) => {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [errors, setErrors]: any = useState({});
+
+    useEffect(() => {
+        if(props.isEditing) {
+          setName(props.itemToEdit.name);
+          setDescription(props.itemToEdit.description);
+        } else {
+          setName('');
+          setDescription('');
+        }
+      }, [props.isEditing, props.itemToEdit]);
 
     const save = () => {
 
@@ -30,13 +43,17 @@ const SimpleModal: React.FC<SimpleModalProps> = (props: any) => {
             setErrors({message: 'Description must be at least 4 characters.'})
           } else {
     
-            const newItem = {
+            const newItem: any = {
               name,
               description
             };
     
-            props.addToList(newItem);
-            
+            if(!props.isEditing) {
+                props.addToList(newItem);
+            } else {
+                newItem.id = props.itemToEdit.id;
+                props.editFromList(newItem);
+            }
     
             setName('');
             setDescription('');

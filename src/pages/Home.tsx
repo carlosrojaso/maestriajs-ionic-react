@@ -26,6 +26,8 @@ import uuidv4 from 'uuid/v4';
 
 const Home: React.FC = () => {
   const [itemsArray, setItemsArray] : any = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [itemToEdit, setItemToEdit] = useState({});
 
   useEffect(() => {
     setItemsArray(DummyData);
@@ -41,6 +43,32 @@ const Home: React.FC = () => {
     tmpList.push(item);
 
     setItemsArray(tmpList);
+  };
+
+  const editFromList = (item: any) => {
+    
+    const tmpList = [...itemsArray];
+
+    const itemIndex = itemsArray.findIndex((elem: any) => (elem.id === item.id));
+
+    tmpList[itemIndex] = {...item};
+
+    setItemsArray(tmpList);
+    setItemToEdit({});
+    setIsEditing(false);
+
+    handleClose(); 
+  };
+
+  const getItemToEdit = (id: any) => {
+    
+    const itemIndex = itemsArray.findIndex((elem: any) => (elem.id === id));
+    const tmpItem = {...itemsArray[itemIndex]};
+
+    setItemToEdit(tmpItem);
+    setIsEditing(true);
+
+    handleOpen();
   };
 
   const removeFromList = (key: number) => {
@@ -80,7 +108,7 @@ const Home: React.FC = () => {
               </IonLabel>
             </IonItem>
             <IonItemOptions side="end">
-            <IonItemOption>Edit</IonItemOption>
+            <IonItemOption onClick={() => getItemToEdit(item.id)}>Edit</IonItemOption>
             <IonItemOption onClick={() => removeFromList(item.id)} color="secondary">Delete</IonItemOption>     
             </IonItemOptions>
           </IonItemSliding>
@@ -90,9 +118,12 @@ const Home: React.FC = () => {
       </IonContent>
       <SimpleModal 
         addToList={addToList}
+        editFromList={editFromList}
         toggleModal={setOpenModal}
         isOpen={openModal}
         handleClose={handleClose}
+        isEditing={isEditing}
+        itemToEdit={itemToEdit}
       />
       <IonFab onClick={() => handleOpen()} vertical="bottom" horizontal="end" slot="fixed">
         <IonFabButton>
